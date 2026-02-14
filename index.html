@@ -1,68 +1,98 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>大樂透幸運號碼產生器</title>
-  <style>
-    body { font-family: system-ui, sans-serif; background: #0d001a; color: #f0e8ff; min-height: 100vh; margin: 0; padding: 30px 15px; text-align: center; }
-    h1 { color: #ffd700; }
-    .container { max-width: 600px; margin: 0 auto; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 2rem; }
-    #loading { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; gap: 1.5rem; font-size: 1.4rem; color: #ffd700; }
-    .spinner { width: 50px; height: 50px; border: 5px solid #4a2c8c; border-top: 5px solid #ffd700; border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .numbers { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 1.5rem 0; }
-    .ball { width: 60px; height: 60px; line-height: 60px; border-radius: 50%; font-size: 1.8rem; font-weight: bold; color: white; text-align: center; }
-    .ball.zone1 { background: #c0392b; }
-    .ball.zone2 { background: #2980b9; }
-    button { padding: 14px 60px; font-size: 1.4rem; margin: 2rem 0.5rem; border: none; border-radius: 50px; background: linear-gradient(to bottom, #ffd700, #e6c200); color: #1a1a2e; font-weight: bold; cursor: pointer; }
-    button:hover { background: #ffea80; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    #result { display: none; }
-  </style>
+    <meta charset="UTF-8">
+    <title>BingoBingo 號碼推算器</title>
+    <style>
+        body { font-family:'Microsoft JhengHei',sans-serif; background:#f4f7f6; display:flex; justify-content:center; padding-top:50px; }
+        .container { background:#fff; padding:100px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); width:600px; text-align:center; }
+        .grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:10px; margin:15px 0; }
+        .grid input {
+    width: 60px;
+    height: 25px;
+    padding:10px;
+    font-size: 20px;
+    text-align: center;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+}
+        button { background:#007bff; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-size:16px; }
+        button:hover { background:#0056b3; }
+        .result { margin-top:30px; display:flex; flex-wrap:wrap; justify-content:center; gap:8px; }
+        .ball { width:45px; height:45px; background:#007bff; color:#fff; border-radius:50%; line-height:45px; font-weight:bold; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>大樂透幸運號碼產生器</h1>
-    <div id="loading">
-      <div class="spinner"></div>
-      <div>正在執行運算中...</div>
+<div class="container">
+    <h2>🎯 BingoBingo 號碼推算器</h2>
+    <p>請輸入前一期 20 個號碼</p>
+    <div class="grid">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
+        <input type="text" inputmode="numeric" maxlength="2">
     </div>
-    <div id="result">
-      <h3>今日幸運的6個號碼</h3>
-      <div class="numbers" id="zone1"></div>
-    </div>
-    <button id="btn">開始運算</button>
-  </div>
-
-  <script>
-    const btn = document.getElementById('btn');
-    const loading = document.getElementById('loading');
-    const result = document.getElementById('result');
-
-    function getRandomNumbers() {
-      const pool = Array.from({length: 48}, (_, i) => i+1);
-      for (let i = pool.length-1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i+1));
-        [pool[i], pool[j]] = [pool[j], pool[i]];
-      }
-      const zone1 = pool.slice(0,6).sort((a,b)=>a-b);
-
-      document.getElementById('zone1').innerHTML = zone1.map(n => `<div class="ball zone1">${n}</div>`).join('');
+    <button onclick="getPrediction()">開始預測</button>
+    <div id="display" class="result"></div>
+</div>
+<script>
+function getPrediction(){
+    const inputs = document.querySelectorAll('.grid input');
+    const display = document.getElementById('display');
+    const nums = [];
+    for(let inp of inputs){
+        const v = inp.value.trim();
+        if(!/^\d+$/.test(v)){
+            alert("只能輸入數字");
+            return;
+        }
+        const n = parseInt(v);
+        if(n < 1 || n > 80){
+            alert("數字必須在 1~80 之間");
+            return;
+        }
     }
-
-    btn.onclick = () => {
-      btn.disabled = true;
-      loading.style.display = 'flex';
-      result.style.display = 'none';
-
-      setTimeout(() => {
-        getRandomNumbers();
-        loading.style.display = 'none';
-        result.style.display = 'block';
-        btn.disabled = false;
-      }, 314159);
-    };
-  </script>
+    const weights = Array(81).fill(0.25);
+    nums.forEach(n => weights[n] += 1);
+    weights[0] = 0;
+    function weightedRandom(arr){
+        const sum = arr.reduce((a,b)=>a+b,0);
+        let r = Math.random() * sum;
+        for(let i=0;i<arr.length;i++){
+            r -= arr[i];
+            if(r <= 0) return i;
+        }
+        return arr.length-1;
+    }
+    const result = [];
+    const temp = [...weights];
+    while(result.length < 10){
+        const pick = weightedRandom(temp);
+        if(pick >= 1 && pick <= 80){
+            result.push(pick);
+            temp[pick] = 0;
+        }
+    }
+    result.sort((a,b)=>a-b);
+    display.innerHTML = result.map(n=>`<div class="ball">${n}</div>`).join('');
+}
+</script>
 </body>
 </html>
